@@ -1,0 +1,14 @@
+# backend/requirements.txt
+fastapi==0.115.0
+uvicorn==0.30.6
+pydantic==2.8.2
+python-dotenv==1.0.1
+langgraph==0.2.52
+langchain==0.3.11
+langchain-core==0.3.11
+langsmith==0.1.125
+chromadb==0.5.23
+psycopg[binary]==3.2.1
+sqlalchemy==2.0.35
+requests==2.32.2
+numpy==2.1.2

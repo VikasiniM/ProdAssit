@@ -1,4 +1,5 @@
 import {
+  alpha,
   Alert,
   Box,
   Card,
@@ -6,10 +7,12 @@ import {
   Chip,
   Divider,
   Grid,
+  IconButton,
   LinearProgress,
   List,
   ListItem,
   ListItemText,
+  Paper,
   Stack,
   Table,
   TableBody,
@@ -17,6 +20,9 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
   Avatar,
 } from '@mui/material';
@@ -25,9 +31,13 @@ import {
   AutoAwesome,
   Group,
   MonitorHeart,
+  NotificationsNoneRounded,
+  SearchRounded,
   Speed,
   Timeline,
   WarningAmber,
+  Brightness4Rounded,
+  Brightness7Rounded,
 } from '@mui/icons-material';
 
 const stats = [
@@ -44,9 +54,7 @@ const workflows = [
 ];
 
 const activities = ['Issue review', 'Knowledge refresh', 'Model validation', 'Workflow update'];
-
-const chartSeries = [68, 80, 62, 90, 76, 88, 94];
-
+const trendSeries = [68, 80, 62, 90, 76, 88, 94];
 const operationRows = [
   { workflow: 'Support intake', owner: 'Ops Team', status: 'Healthy', sla: '94%', throughput: '2.4k/hr' },
   { workflow: 'Risk review', owner: 'Compliance', status: 'Monitoring', sla: '87%', throughput: '1.8k/hr' },
@@ -54,7 +62,18 @@ const operationRows = [
   { workflow: 'Escalation queue', owner: 'Customer Care', status: 'Healthy', sla: '96%', throughput: '3.1k/hr' },
 ];
 
+const reportCards = [
+  { title: 'Resolved tickets', value: '2,480', delta: '+8.3%' },
+  { title: 'Knowledge coverage', value: '92%', delta: '+3.7%' },
+  { title: 'Automation rate', value: '73%', delta: '+5.1%' },
+  { title: 'Escalation time', value: '17m', delta: '-2.1%' },
+];
+
+const filters = ['All', 'Ops', 'Support', 'AI', 'Compliance'];
+
 export default function DashboardPage() {
+  const [selectedFilter, setSelectedFilter] = React.useState('All');
+
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, minHeight: '100vh', background: 'linear-gradient(180deg, #f4f7fb 0%, #eef4ff 100%)' }}>
       <Stack
@@ -73,10 +92,41 @@ export default function DashboardPage() {
           </Typography>
         </Box>
 
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Chip label="System healthy" color="success" />
+        <Stack direction="row" spacing={2} alignItems="center" sx={{ width: { xs: '100%', md: 'auto' } }}>
+          <TextField
+            size="small"
+            placeholder="Search workflows"
+            InputProps={{
+              startAdornment: <SearchRounded fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />,
+            }}
+            sx={{ minWidth: { xs: '100%', md: 220 }, backgroundColor: 'white', borderRadius: 2 }}
+          />
+          <IconButton size="small" sx={{ backgroundColor: '#fff', border: '1px solid #e2e8f0' }}>
+            <NotificationsNoneRounded />
+          </IconButton>
+          <IconButton size="small" sx={{ backgroundColor: '#fff', border: '1px solid #e2e8f0' }}>
+            <Brightness7Rounded />
+          </IconButton>
           <Avatar sx={{ bgcolor: '#0f172a', width: 38, height: 38 }}>VP</Avatar>
         </Stack>
+      </Stack>
+
+      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'center' }} spacing={2} sx={{ mb: 3 }}>
+        <ToggleButtonGroup
+          value={selectedFilter}
+          exclusive
+          onChange={(_, value) => value && setSelectedFilter(value)}
+          size="small"
+          sx={{ flexWrap: 'wrap', gap: 1 }}
+        >
+          {filters.map((filter) => (
+            <ToggleButton key={filter} value={filter} sx={{ borderRadius: 999 }}>
+              {filter}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+
+        <Chip label="System healthy" color="success" />
       </Stack>
 
       <Grid container spacing={3}>
@@ -188,7 +238,7 @@ export default function DashboardPage() {
               </Stack>
 
               <Stack direction="row" spacing={1} alignItems="flex-end" sx={{ minHeight: 180, px: 0.5 }}>
-                {chartSeries.map((value, index) => (
+                {trendSeries.map((value, index) => (
                   <Box key={index} sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <Box
                       sx={{
@@ -279,6 +329,22 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </Box>
+
+      <Grid container spacing={3} sx={{ mt: 0.5 }}>
+        {reportCards.map((card) => (
+          <Grid item xs={12} sm={6} md={3} key={card.title}>
+            <Card>
+              <CardContent>
+                <Typography variant="body2" color="text.secondary">{card.title}</Typography>
+                <Typography variant="h5" sx={{ mt: 1 }}>{card.value}</Typography>
+                <Typography variant="caption" color="success.main" sx={{ mt: 0.5, display: 'block' }}>
+                  {card.delta}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
     </Box>
   );
 }

@@ -47,8 +47,24 @@ a {
   text-decoration: none;
 }
 
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e2e8f0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 999px;
+}
+
 @media (max-width: 900px) {
-  html, body, #root {
+  html,
+  body,
+  #root {
     overflow-x: hidden;
   }
 }

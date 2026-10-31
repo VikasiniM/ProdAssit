@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   alpha,
   Box,
@@ -38,8 +39,7 @@ const navItems = [
 export default function Sidebar({ sessions, selectedSessionId, onSelectSession }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
-
-  const isCollapsed = false;
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <Box
@@ -92,6 +92,7 @@ export default function Sidebar({ sessions, selectedSessionId, onSelectSession }
         <Box sx={{ display: 'flex', justifyContent: isCollapsed ? 'center' : 'flex-end' }}>
           <IconButton
             size="small"
+            onClick={() => setIsCollapsed((current) => !current)}
             sx={{ color: '#dbeafe', backgroundColor: 'rgba(255,255,255,0.04)' }}
             aria-label="Toggle sidebar"
           >

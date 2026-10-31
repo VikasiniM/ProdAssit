@@ -2,6 +2,7 @@ import {
   alpha,
   Box,
   Divider,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -11,10 +12,11 @@ import {
   Typography,
 } from '@mui/material';
 import {
+  ChevronLeftRounded,
+  ChevronRightRounded,
   ChatRounded,
   DashboardRounded,
   HistoryRounded,
-  KeyboardArrowRightRounded,
   SettingsRounded,
 } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -37,19 +39,28 @@ export default function Sidebar({ sessions, selectedSessionId, onSelectSession }
   const navigate = useNavigate();
   const location = useLocation();
 
+  const isCollapsed = false;
+
   return (
     <Box
       sx={{
-        width: 280,
+        width: isCollapsed ? 88 : 280,
         minHeight: '100vh',
         background: 'linear-gradient(180deg, #0b1120 0%, #111827 100%)',
         color: '#e2e8f0',
         borderRight: '1px solid rgba(148, 163, 184, 0.2)',
         p: 2,
+        transition: 'width 0.2s ease',
       }}
     >
       <Stack spacing={2.5} sx={{ height: '100%' }}>
-        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ px: 1.25, py: 1 }}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent={isCollapsed ? 'center' : 'flex-start'}
+          spacing={1.5}
+          sx={{ px: 1.25, py: 1 }}
+        >
           <Box
             sx={{
               width: 34,
@@ -65,15 +76,28 @@ export default function Sidebar({ sessions, selectedSessionId, onSelectSession }
           >
             P
           </Box>
-          <Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-              ProdAssist
-            </Typography>
-            <Typography variant="caption" sx={{ color: '#94a3b8' }}>
-              Enterprise AI
-            </Typography>
-          </Box>
+
+          {!isCollapsed && (
+            <Box>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+                ProdAssist
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#94a3b8' }}>
+                Enterprise AI
+              </Typography>
+            </Box>
+          )}
         </Stack>
+
+        <Box sx={{ display: 'flex', justifyContent: isCollapsed ? 'center' : 'flex-end' }}>
+          <IconButton
+            size="small"
+            sx={{ color: '#dbeafe', backgroundColor: 'rgba(255,255,255,0.04)' }}
+            aria-label="Toggle sidebar"
+          >
+            {isCollapsed ? <ChevronRightRounded /> : <ChevronLeftRounded />}
+          </IconButton>
+        </Box>
 
         <Divider sx={{ borderColor: 'rgba(148, 163, 184, 0.2)' }} />
 
@@ -86,6 +110,7 @@ export default function Sidebar({ sessions, selectedSessionId, onSelectSession }
                 sx={{
                   borderRadius: 2,
                   color: 'inherit',
+                  justifyContent: isCollapsed ? 'center' : 'flex-start',
                   '&.Mui-selected': {
                     backgroundColor: alpha('#60a5fa', 0.18),
                     color: '#e0f2fe',
@@ -95,11 +120,15 @@ export default function Sidebar({ sessions, selectedSessionId, onSelectSession }
                   },
                 }}
               >
-                <ListItemIcon sx={{ color: 'inherit', minWidth: 36 }}>
+                <ListItemIcon sx={{ color: 'inherit', minWidth: isCollapsed ? 0 : 36 }}>
                   <Icon fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary={label} primaryTypographyProps={{ fontWeight: 600 }} />
-                <KeyboardArrowRightRounded fontSize="small" sx={{ color: '#94a3b8' }} />
+                {!isCollapsed && (
+                  <ListItemText
+                    primary={label}
+                    primaryTypographyProps={{ fontWeight: 600, fontSize: 14 }}
+                  />
+                )}
               </ListItemButton>
             </ListItem>
           ))}
@@ -107,46 +136,48 @@ export default function Sidebar({ sessions, selectedSessionId, onSelectSession }
 
         <Divider sx={{ borderColor: 'rgba(148, 163, 184, 0.2)' }} />
 
-        <Box>
-          <Typography variant="caption" sx={{ px: 1.5, color: '#94a3b8', textTransform: 'uppercase' }}>
-            Recent sessions
-          </Typography>
+        {!isCollapsed && (
+          <Box>
+            <Typography variant="caption" sx={{ px: 1.5, color: '#94a3b8', textTransform: 'uppercase' }}>
+              Recent sessions
+            </Typography>
 
-          <List disablePadding sx={{ mt: 1 }}>
-            {sessions.length === 0 ? (
-              <ListItem disablePadding>
-                <ListItemText
-                  primary="No sessions yet"
-                  secondary="Start a conversation"
-                  primaryTypographyProps={{ color: '#dbeafe', fontWeight: 500 }}
-                  secondaryTypographyProps={{ color: '#94a3b8' }}
-                />
-              </ListItem>
-            ) : (
-              sessions.slice(0, 5).map((session) => (
-                <ListItem key={session.id} disablePadding sx={{ mb: 0.5 }}>
-                  <ListItemButton
-                    selected={session.id === selectedSessionId}
-                    onClick={() => onSelectSession(session.id)}
-                    sx={{
-                      borderRadius: 2,
-                      '&.Mui-selected': {
-                        backgroundColor: alpha('#60a5fa', 0.16),
-                      },
-                    }}
-                  >
-                    <ListItemText
-                      primary={session.title}
-                      secondary={new Date(session.updatedAt).toLocaleString()}
-                      primaryTypographyProps={{ color: '#e2e8f0', fontWeight: 500 }}
-                      secondaryTypographyProps={{ color: '#94a3b8' }}
-                    />
-                  </ListItemButton>
+            <List disablePadding sx={{ mt: 1 }}>
+              {sessions.length === 0 ? (
+                <ListItem disablePadding>
+                  <ListItemText
+                    primary="No sessions yet"
+                    secondary="Start a conversation"
+                    primaryTypographyProps={{ color: '#dbeafe', fontWeight: 500 }}
+                    secondaryTypographyProps={{ color: '#94a3b8' }}
+                  />
                 </ListItem>
-              ))
-            )}
-          </List>
-        </Box>
+              ) : (
+                sessions.slice(0, 5).map((session) => (
+                  <ListItem key={session.id} disablePadding sx={{ mb: 0.5 }}>
+                    <ListItemButton
+                      selected={session.id === selectedSessionId}
+                      onClick={() => onSelectSession(session.id)}
+                      sx={{
+                        borderRadius: 2,
+                        '&.Mui-selected': {
+                          backgroundColor: alpha('#60a5fa', 0.16),
+                        },
+                      }}
+                    >
+                      <ListItemText
+                        primary={session.title}
+                        secondary={new Date(session.updatedAt).toLocaleString()}
+                        primaryTypographyProps={{ color: '#e2e8f0', fontWeight: 500 }}
+                        secondaryTypographyProps={{ color: '#94a3b8' }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                ))
+              )}
+            </List>
+          </Box>
+        )}
       </Stack>
     </Box>
   );

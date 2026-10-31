@@ -46,3 +46,9 @@ img {
 a {
   text-decoration: none;
 }
+
+@media (max-width: 900px) {
+  html, body, #root {
+    overflow-x: hidden;
+  }
+}

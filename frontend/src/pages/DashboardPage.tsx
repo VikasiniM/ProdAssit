@@ -11,6 +11,12 @@ import {
   ListItem,
   ListItemText,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
   Avatar,
 } from '@mui/material';
@@ -28,7 +34,7 @@ const stats = [
   { label: 'Active sessions', value: '128', change: '+12.4%', icon: Group },
   { label: 'Avg. response', value: '1.4s', change: '-8.2%', icon: Speed },
   { label: 'Automation', value: '87%', change: '+5.1%', icon: AutoAwesome },
-  { label: 'Alerts', value: '14', change: 'Need review', icon: WarningAmber },
+  { label: 'Alerts', value: '14', change: 'Needs review', icon: WarningAmber },
 ];
 
 const workflows = [
@@ -39,9 +45,18 @@ const workflows = [
 
 const activities = ['Issue review', 'Knowledge refresh', 'Model validation', 'Workflow update'];
 
+const chartSeries = [68, 80, 62, 90, 76, 88, 94];
+
+const operationRows = [
+  { workflow: 'Support intake', owner: 'Ops Team', status: 'Healthy', sla: '94%', throughput: '2.4k/hr' },
+  { workflow: 'Risk review', owner: 'Compliance', status: 'Monitoring', sla: '87%', throughput: '1.8k/hr' },
+  { workflow: 'Knowledge sync', owner: 'AI Platform', status: 'Delayed', sla: '72%', throughput: '1.1k/hr' },
+  { workflow: 'Escalation queue', owner: 'Customer Care', status: 'Healthy', sla: '96%', throughput: '3.1k/hr' },
+];
+
 export default function DashboardPage() {
   return (
-    <Box sx={{ p: 3, minHeight: '100vh', background: 'linear-gradient(180deg, #f4f7fb 0%, #eef4ff 100%)' }}>
+    <Box sx={{ p: { xs: 2, md: 3 }, minHeight: '100vh', background: 'linear-gradient(180deg, #f4f7fb 0%, #eef4ff 100%)' }}>
       <Stack
         direction={{ xs: 'column', md: 'row' }}
         justifyContent="space-between"
@@ -95,12 +110,7 @@ export default function DashboardPage() {
         <Grid item xs={12} lg={8}>
           <Card>
             <CardContent>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{ mb: 2 }}
-              >
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
                 <Typography variant="h6">Workflow health</Typography>
                 <Assessment color="primary" />
               </Stack>
@@ -168,27 +178,104 @@ export default function DashboardPage() {
         </Grid>
       </Grid>
 
+      <Grid container spacing={3} sx={{ mt: 0.5 }}>
+        <Grid item xs={12} lg={7}>
+          <Card>
+            <CardContent>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                <Typography variant="h6">Throughput trend</Typography>
+                <Chip label="+14.8%" color="success" />
+              </Stack>
+
+              <Stack direction="row" spacing={1} alignItems="flex-end" sx={{ minHeight: 180, px: 0.5 }}>
+                {chartSeries.map((value, index) => (
+                  <Box key={index} sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <Box
+                      sx={{
+                        width: '100%',
+                        maxWidth: 28,
+                        height: `${value}%`,
+                        minHeight: 18,
+                        borderRadius: '8px 8px 0 0',
+                        background: 'linear-gradient(180deg, #93c5fd 0%, #2563eb 100%)',
+                      }}
+                    />
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                      {['M', 'T', 'W', 'T', 'F', 'S', 'S'][index]}
+                    </Typography>
+                  </Box>
+                ))}
+              </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} lg={5}>
+          <Card>
+            <CardContent>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                <Typography variant="h6">Operations pulse</Typography>
+                <MonitorHeart color="success" />
+              </Stack>
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Typography variant="h3" sx={{ fontWeight: 800, lineHeight: 1 }}>
+                  96.8%
+                </Typography>
+                <Typography variant="body2" color="success.main" fontWeight={700}>
+                  service confidence
+                </Typography>
+              </Stack>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                Critical systems are operational, and the AI workflow is tracking within expected SLA bands.
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
       <Box sx={{ mt: 3 }}>
         <Card>
           <CardContent>
-            <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2}>
-              <Box>
-                <Typography variant="h6">Operations pulse</Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                  Business-critical signals are stable and tracking to plan.
-                </Typography>
-              </Box>
-              <Stack direction="row" spacing={2} alignItems="center">
-                <MonitorHeart color="success" />
-                <Typography variant="body2" color="success.main" fontWeight={700}>
-                  96.8% service confidence
-                </Typography>
-              </Stack>
-            </Stack>
-            <Divider sx={{ my: 2 }} />
-            <Typography variant="body2" color="text.secondary">
-              The assistant is ready to support internal operations, document retrieval, and workflow automation.
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Workflow operations
             </Typography>
+
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Workflow</TableCell>
+                    <TableCell>Owner</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>SLA</TableCell>
+                    <TableCell>Throughput</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {operationRows.map((row) => (
+                    <TableRow key={row.workflow} hover>
+                      <TableCell>{row.workflow}</TableCell>
+                      <TableCell>{row.owner}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={row.status}
+                          size="small"
+                          color={
+                            row.status === 'Healthy'
+                              ? 'success'
+                              : row.status === 'Monitoring'
+                                ? 'warning'
+                                : 'error'
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>{row.sla}</TableCell>
+                      <TableCell>{row.throughput}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </CardContent>
         </Card>
       </Box>

@@ -8,7 +8,7 @@ export default function LoginPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        p: 3,
+        p: { xs: 2, md: 3 },
         background: 'radial-gradient(circle at top, #e0ecff 0%, #f4f7fb 40%, #eef2ff 100%)',
       }}
     >
@@ -29,7 +29,7 @@ export default function LoginPage() {
           </Typography>
         </Box>
 
-        <CardContent sx={{ p: 3 }}>
+        <CardContent sx={{ p: { xs: 2, md: 3 } }}>
           <Stack spacing={3}>
             <Box>
               <Typography variant="h4">Welcome back</Typography>

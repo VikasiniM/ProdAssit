@@ -67,7 +67,7 @@ export default function ChatPage() {
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', background: '#f3f6fb' }}>
       <Sidebar
         sessions={sessions}
         selectedSessionId={sessionId}
@@ -75,22 +75,29 @@ export default function ChatPage() {
       />
 
       <Box sx={{ flex: 1, p: 3 }}>
-        <Typography variant="h4" sx={{ mb: 2 }}>
-          Assistant Chat
-        </Typography>
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="caption" color="text.secondary" sx={{ letterSpacing: 1.2 }}>
+            ASSISTANT CONSOLE
+          </Typography>
+          <Typography variant="h4" sx={{ mt: 0.75 }}>
+            AI operations chat
+          </Typography>
+        </Box>
 
         <Grid container spacing={3}>
           <Grid item xs={12} lg={8}>
-            <Paper sx={{ p: 2, borderRadius: 3, minHeight: 500 }}>
+            <Paper sx={{ p: 2.5, borderRadius: 3, minHeight: 520, background: '#ffffff' }}>
               <Stack spacing={2}>
                 {messages.length === 0 ? (
-                  <Alert severity="info">Ask a question to begin your session.</Alert>
+                  <Alert severity="info" sx={{ borderRadius: 2 }}>
+                    Ask a question to begin your session.
+                  </Alert>
                 ) : (
                   messages.map((message) => <ChatMessage key={message.id} message={message} />)
                 )}
 
                 {isPending && (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 1 }}>
                     <CircularProgress size={18} />
                     <Typography>Thinking...</Typography>
                   </Box>
@@ -99,12 +106,14 @@ export default function ChatPage() {
                 {error && <Alert severity="error">{String(error)}</Alert>}
               </Stack>
 
-              <ChatComposer onSubmit={handleSubmitQuestion} disabled={isPending} />
+              <Box sx={{ mt: 2 }}>
+                <ChatComposer onSubmit={handleSubmitQuestion} disabled={isPending} />
+              </Box>
             </Paper>
           </Grid>
 
           <Grid item xs={12} lg={4}>
-            <Paper sx={{ p: 2, borderRadius: 3 }}>
+            <Paper sx={{ p: 2.5, borderRadius: 3, background: '#ffffff' }}>
               {activeResponse ? (
                 <>
                   <CitationList citations={activeResponse.citations ?? []} />

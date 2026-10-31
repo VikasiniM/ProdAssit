@@ -8,7 +8,7 @@ const theme = createTheme({
     mode: 'light',
     primary: {
       main: '#0f172a',
-      light: '#1e3a8a',
+      light: '#1d4ed8',
       dark: '#020817',
     },
     secondary: {
@@ -46,7 +46,7 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          boxShadow: '0 10px 30px rgba(15, 23, 42, 0.06)',
+          boxShadow: '0 12px 30px rgba(15, 23, 42, 0.06)',
           border: '1px solid rgba(148, 163, 184, 0.18)',
         },
       },
@@ -54,8 +54,15 @@ const theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          boxShadow: '0 10px 30px rgba(15, 23, 42, 0.06)',
+          boxShadow: '0 12px 30px rgba(15, 23, 42, 0.06)',
           border: '1px solid rgba(148, 163, 184, 0.18)',
+        },
+      },
+    },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
         },
       },
     },

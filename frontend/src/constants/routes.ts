@@ -3,5 +3,8 @@ export const ROUTES = {
   dashboard: '/',
   chat: '/chat',
   sessions: '/sessions',
+  operations: '/operations',
+  reports: '/reports',
+  settings: '/settings',
   notFound: '*',
 };

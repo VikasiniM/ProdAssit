@@ -17,7 +17,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   TextField,
@@ -38,35 +37,42 @@ import {
   Timeline,
   WarningAmber,
 } from '@mui/icons-material';
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import EnterpriseMetricCard from '../components/EnterpriseMetricCard';
 
 const filters = ['All', 'Ops', 'Support', 'AI', 'Compliance'];
-
-const stats = [
-  { label: 'Active sessions', value: '128', change: '+12.4%', icon: Group },
-  { label: 'Avg. response', value: '1.4s', change: '-8.2%', icon: Speed },
-  { label: 'Automation', value: '87%', change: '+5.1%', icon: AutoAwesome },
-  { label: 'Alerts', value: '14', change: 'Needs review', icon: WarningAmber },
+const trendData = [
+  { name: 'Jan', value: 40 },
+  { name: 'Feb', value: 52 },
+  { name: 'Mar', value: 56 },
+  { name: 'Apr', value: 64 },
+  { name: 'May', value: 72 },
+  { name: 'Jun', value: 80 },
+  { name: 'Jul', value: 87 },
 ];
 
-const workflows = [
-  { name: 'Customer intelligence', status: 'Healthy', progress: 82, color: '#16a34a' },
-  { name: 'Support triage', status: 'Monitoring', progress: 64, color: '#f59e0b' },
-  { name: 'Knowledge sync', status: 'Delayed', progress: 42, color: '#ef4444' },
+const workflowRows = [
+  { workflow: 'Support intake', owner: 'Ops Team', status: 'Healthy', value: '94%', group: 'Ops' },
+  { workflow: 'Risk review', owner: 'Compliance', status: 'Monitoring', value: '87%', group: 'Compliance' },
+  { workflow: 'Knowledge sync', owner: 'AI Platform', status: 'Delayed', value: '72%', group: 'AI' },
+  { workflow: 'Escalation queue', owner: 'Customer Care', status: 'Healthy', value: '96%', group: 'Support' },
 ];
 
-const activities = ['Issue review', 'Knowledge refresh', 'Model validation', 'Workflow update'];
-const trendSeries = [68, 80, 62, 90, 76, 88, 94];
-const operationRows = [
-  { workflow: 'Support intake', owner: 'Ops Team', status: 'Healthy', sla: '94%', throughput: '2.4k/hr', group: 'Ops' },
-  { workflow: 'Risk review', owner: 'Compliance', status: 'Monitoring', sla: '87%', throughput: '1.8k/hr', group: 'Compliance' },
-  { workflow: 'Knowledge sync', owner: 'AI Platform', status: 'Delayed', sla: '72%', throughput: '1.1k/hr', group: 'AI' },
-  { workflow: 'Escalation queue', owner: 'Customer Care', status: 'Healthy', sla: '96%', throughput: '3.1k/hr', group: 'Support' },
-];
-const reportCards = [
-  { title: 'Resolved tickets', value: '2,480', delta: '+8.3%' },
-  { title: 'Knowledge coverage', value: '92%', delta: '+3.7%' },
-  { title: 'Automation rate', value: '73%', delta: '+5.1%' },
-  { title: 'Escalation time', value: '17m', delta: '-2.1%' },
+const reportData = [
+  { name: 'Resolved', value: 320 },
+  { name: 'Queued', value: 210 },
+  { name: 'Escalated', value: 96 },
+  { name: 'Reviewed', value: 140 },
 ];
 
 export default function DashboardPage() {
@@ -78,26 +84,20 @@ export default function DashboardPage() {
     ? 'linear-gradient(180deg, #020817 0%, #0f172a 100%)'
     : 'linear-gradient(180deg, #f4f7fb 0%, #eef4ff 100%)';
   const panelBackground = isDark ? '#0f172a' : '#ffffff';
-  const panelBorder = isDark ? 'rgba(148, 163, 184, 0.18)' : '#e2e8f0';
+  const panelBorder = isDark ? 'rgba(148,163,184,0.17)' : '#e2e8f0';
   const textColor = isDark ? '#e2e8f0' : '#0f172a';
   const secondaryText = isDark ? '#94a3b8' : '#475569';
   const surfaceColor = isDark ? '#111827' : '#f8fafc';
   const inputBackground = isDark ? '#0b1120' : '#ffffff';
 
   const visibleRows = useMemo(() => {
-    if (selectedFilter === 'All') return operationRows;
-    return operationRows.filter((row) => row.group === selectedFilter);
+    if (selectedFilter === 'All') return workflowRows;
+    return workflowRows.filter((row) => row.group === selectedFilter);
   }, [selectedFilter]);
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, minHeight: '100vh', background: pageBackground, color: textColor }}>
-      <Stack
-        direction={{ xs: 'column', md: 'row' }}
-        justifyContent="space-between"
-        alignItems={{ xs: 'flex-start', md: 'center' }}
-        spacing={2}
-        sx={{ mb: 3 }}
-      >
+      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'center' }} spacing={2} sx={{ mb: 3 }}>
         <Box>
           <Typography variant="caption" color={secondaryText} sx={{ letterSpacing: 1.2 }}>
             ENTERPRISE AI PORTAL
@@ -126,81 +126,40 @@ export default function DashboardPage() {
             }}
           />
           <Chip label="12 alerts" color="warning" variant={isDark ? 'filled' : 'outlined'} />
-          <IconButton
-            size="small"
-            onClick={() => setThemeMode((current) => (current === 'light' ? 'dark' : 'light'))}
-            sx={{ backgroundColor: alpha('#ffffff', isDark ? 0.06 : 0.9), border: `1px solid ${panelBorder}` }}
-          >
+          <IconButton size="small" onClick={() => setThemeMode((current) => (current === 'light' ? 'dark' : 'light'))} sx={{ backgroundColor: alpha('#ffffff', isDark ? 0.06 : 0.9), border: `1px solid ${panelBorder}` }}>
             {isDark ? <Brightness7Rounded /> : <Brightness4Rounded />}
           </IconButton>
-          <IconButton
-            size="small"
-            sx={{ backgroundColor: alpha('#ffffff', isDark ? 0.06 : 0.9), border: `1px solid ${panelBorder}` }}
-          >
+          <IconButton size="small" sx={{ backgroundColor: alpha('#ffffff', isDark ? 0.06 : 0.9), border: `1px solid ${panelBorder}` }}>
             <NotificationsNoneRounded />
           </IconButton>
           <Avatar sx={{ bgcolor: isDark ? '#1e293b' : '#0f172a', width: 38, height: 38 }}>VP</Avatar>
         </Stack>
       </Stack>
 
-      <Stack
-        direction={{ xs: 'column', md: 'row' }}
-        justifyContent="space-between"
-        alignItems={{ xs: 'flex-start', md: 'center' }}
-        spacing={2}
-        sx={{ mb: 3 }}
-      >
-        <ToggleButtonGroup
-          value={selectedFilter}
-          exclusive
-          onChange={(_, value) => value && setSelectedFilter(value)}
-          size="small"
-          sx={{ flexWrap: 'wrap', gap: 1 }}
-        >
+      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'center' }} spacing={2} sx={{ mb: 3 }}>
+        <ToggleButtonGroup value={selectedFilter} exclusive onChange={(_, value) => value && setSelectedFilter(value)} size="small" sx={{ flexWrap: 'wrap', gap: 1 }}>
           {filters.map((filter) => (
-            <ToggleButton
-              key={filter}
-              value={filter}
-              sx={{
-                borderRadius: 999,
-                borderColor: panelBorder,
-                color: textColor,
-                backgroundColor: selectedFilter === filter ? alpha('#3b82f6', isDark ? 0.18 : 0.12) : 'transparent',
-              }}
-            >
+            <ToggleButton key={filter} value={filter} sx={{ borderRadius: 999, borderColor: panelBorder, color: textColor, backgroundColor: selectedFilter === filter ? alpha('#3b82f6', isDark ? 0.18 : 0.12) : 'transparent' }}>
               {filter}
             </ToggleButton>
           ))}
         </ToggleButtonGroup>
-
         <Chip label="System healthy" color="success" />
       </Stack>
 
       <Grid container spacing={3}>
-        {stats.map(({ label, value, change, icon: Icon }) => (
-          <Grid item xs={12} sm={6} md={3} key={label}>
-            <Card sx={{ background: panelBackground, border: `1px solid ${panelBorder}` }}>
-              <CardContent>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Box>
-                    <Typography variant="body2" color={secondaryText}>
-                      {label}
-                    </Typography>
-                    <Typography variant="h4" sx={{ mt: 1, color: textColor }}>
-                      {value}
-                    </Typography>
-                  </Box>
-                  <Avatar sx={{ bgcolor: isDark ? '#1e293b' : '#e0ecff', color: textColor, width: 44, height: 44 }}>
-                    <Icon />
-                  </Avatar>
-                </Stack>
-                <Typography variant="body2" color="primary" sx={{ mt: 2, fontWeight: 600 }}>
-                  {change}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+        <Grid item xs={12} sm={6} md={3}>
+          <EnterpriseMetricCard title="Active sessions" value="128" change="+12.4%" icon={Group} tone="primary" />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <EnterpriseMetricCard title="Avg response" value="1.4s" change="-8.2%" icon={Speed} tone="success" positive={false} />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <EnterpriseMetricCard title="Automation" value="87%" change="+5.1%" icon={AutoAwesome} tone="primary" />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <EnterpriseMetricCard title="Alerts" value="14" change="Needs review" icon={WarningAmber} tone="warning" positive={false} />
+        </Grid>
       </Grid>
 
       <Grid container spacing={3} sx={{ mt: 0.5 }}>
@@ -212,26 +171,13 @@ export default function DashboardPage() {
                 <Assessment color="primary" />
               </Stack>
 
-              {workflows.map((item) => (
-                <Box key={item.name} sx={{ mb: 3 }}>
+              {workflowRows.map((item) => (
+                <Box key={item.workflow} sx={{ mb: 3 }}>
                   <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
-                    <Typography fontWeight={500} sx={{ color: textColor }}>{item.name}</Typography>
-                    <Chip
-                      label={item.status}
-                      size="small"
-                      color={item.status === 'Healthy' ? 'success' : item.status === 'Monitoring' ? 'warning' : 'error'}
-                    />
+                    <Typography fontWeight={500} sx={{ color: textColor }}>{item.workflow}</Typography>
+                    <Chip label={item.status} size="small" color={item.status === 'Healthy' ? 'success' : item.status === 'Monitoring' ? 'warning' : 'error'} />
                   </Stack>
-                  <LinearProgress
-                    variant="determinate"
-                    value={item.progress}
-                    sx={{
-                      height: 10,
-                      borderRadius: 999,
-                      backgroundColor: isDark ? '#1e293b' : '#e2e8f0',
-                      '& .MuiLinearProgress-bar': { backgroundColor: item.color },
-                    }}
-                  />
+                  <LinearProgress variant="determinate" value={item.status === 'Healthy' ? 82 : item.status === 'Monitoring' ? 64 : 42} sx={{ height: 10, borderRadius: 999, backgroundColor: isDark ? '#1e293b' : '#e2e8f0', '& .MuiLinearProgress-bar': { backgroundColor: item.status === 'Healthy' ? '#16a34a' : item.status === 'Monitoring' ? '#f59e0b' : '#ef4444' } }} />
                 </Box>
               ))}
             </CardContent>
@@ -260,14 +206,11 @@ export default function DashboardPage() {
               <Box sx={{ mt: 3 }}>
                 <Typography variant="subtitle2" sx={{ color: textColor }}>Recent activity</Typography>
                 <List disablePadding sx={{ mt: 1.5 }}>
-                  {activities.map((item) => (
+                  {['Issue review', 'Knowledge refresh', 'Model validation', 'Workflow update'].map((item) => (
                     <ListItem key={item} disableGutters sx={{ px: 0 }}>
                       <Stack direction="row" spacing={1} alignItems="center">
                         <Timeline fontSize="small" color="primary" />
-                        <ListItemText
-                          primary={item}
-                          primaryTypographyProps={{ variant: 'body2', color: textColor }}
-                        />
+                        <ListItemText primary={item} primaryTypographyProps={{ variant: 'body2', color: textColor }} />
                       </Stack>
                     </ListItem>
                   ))}
@@ -279,55 +222,46 @@ export default function DashboardPage() {
       </Grid>
 
       <Grid container spacing={3} sx={{ mt: 0.5 }}>
-        <Grid item xs={12} lg={7}>
+        <Grid item xs={12} lg={8}>
           <Card sx={{ background: panelBackground, border: `1px solid ${panelBorder}` }}>
             <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                <Typography variant="h6" sx={{ color: textColor }}>Throughput trend</Typography>
-                <Chip label="+14.8%" color="success" />
-              </Stack>
-
-              <Stack direction="row" spacing={1} alignItems="flex-end" sx={{ minHeight: 180, px: 0.5 }}>
-                {trendSeries.map((value, index) => (
-                  <Box key={index} sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <Box
-                      sx={{
-                        width: '100%',
-                        maxWidth: 28,
-                        height: `${value}%`,
-                        minHeight: 18,
-                        borderRadius: '8px 8px 0 0',
-                        background: 'linear-gradient(180deg, #93c5fd 0%, #2563eb 100%)',
-                      }}
-                    />
-                    <Typography variant="caption" color={secondaryText} sx={{ mt: 1 }}>
-                      {['M', 'T', 'W', 'T', 'F', 'S', 'S'][index]}
-                    </Typography>
-                  </Box>
-                ))}
-              </Stack>
+              <Typography variant="h6" sx={{ color: textColor, mb: 2 }}>Volume trend</Typography>
+              <Box sx={{ width: '100%', height: 260 }}>
+                <ResponsiveContainer>
+                  <AreaChart data={trendData}>
+                    <defs>
+                      <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#cbd5e1'} />
+                    <XAxis dataKey="name" stroke={secondaryText} />
+                    <YAxis stroke={secondaryText} />
+                    <Tooltip />
+                    <Area type="monotone" dataKey="value" stroke="#2563eb" fill="url(#trendFill)" strokeWidth={3} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
 
-        <Grid item xs={12} lg={5}>
+        <Grid item xs={12} lg={4}>
           <Card sx={{ background: panelBackground, border: `1px solid ${panelBorder}` }}>
             <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                <Typography variant="h6" sx={{ color: textColor }}>Operations pulse</Typography>
-                <MonitorHeart color="success" />
-              </Stack>
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Typography variant="h3" sx={{ fontWeight: 800, lineHeight: 1, color: textColor }}>
-                  96.8%
-                </Typography>
-                <Typography variant="body2" color="success.main" fontWeight={700}>
-                  service confidence
-                </Typography>
-              </Stack>
-              <Typography variant="body2" color={secondaryText} sx={{ mt: 2 }}>
-                Critical systems are operational, and the AI workflow is tracking within expected SLA bands.
-              </Typography>
+              <Typography variant="h6" sx={{ color: textColor, mb: 2 }}>Workflow mix</Typography>
+              <Box sx={{ width: '100%', height: 260 }}>
+                <ResponsiveContainer>
+                  <BarChart data={reportData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#cbd5e1'} />
+                    <XAxis dataKey="name" stroke={secondaryText} />
+                    <YAxis stroke={secondaryText} />
+                    <Tooltip />
+                    <Bar dataKey="value" radius={[8, 8, 0, 0]} fill="#2563eb" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -336,9 +270,10 @@ export default function DashboardPage() {
       <Box sx={{ mt: 3 }}>
         <Card sx={{ background: panelBackground, border: `1px solid ${panelBorder}` }}>
           <CardContent>
-            <Typography variant="h6" sx={{ mb: 2, color: textColor }}>
-              Workflow operations
-            </Typography>
+            <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'center' }} spacing={2} sx={{ mb: 2 }}>
+              <Typography variant="h6" sx={{ color: textColor }}>Workflow operations</Typography>
+              <Chip label="Live monitoring" color="primary" variant="outlined" />
+            </Stack>
 
             <Table size="small">
               <TableHead>
@@ -347,7 +282,7 @@ export default function DashboardPage() {
                   <TableCell sx={{ color: secondaryText }}>Owner</TableCell>
                   <TableCell sx={{ color: secondaryText }}>Status</TableCell>
                   <TableCell sx={{ color: secondaryText }}>SLA</TableCell>
-                  <TableCell sx={{ color: secondaryText }}>Throughput</TableCell>
+                  <TableCell sx={{ color: secondaryText }}>Latency</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -356,20 +291,10 @@ export default function DashboardPage() {
                     <TableCell sx={{ color: textColor }}>{row.workflow}</TableCell>
                     <TableCell sx={{ color: textColor }}>{row.owner}</TableCell>
                     <TableCell>
-                      <Chip
-                        label={row.status}
-                        size="small"
-                        color={
-                          row.status === 'Healthy'
-                            ? 'success'
-                            : row.status === 'Monitoring'
-                              ? 'warning'
-                              : 'error'
-                        }
-                      />
+                      <Chip label={row.status} size="small" color={row.status === 'Healthy' ? 'success' : row.status === 'Monitoring' ? 'warning' : 'error'} />
                     </TableCell>
-                    <TableCell sx={{ color: textColor }}>{row.sla}</TableCell>
-                    <TableCell sx={{ color: textColor }}>{row.throughput}</TableCell>
+                    <TableCell sx={{ color: textColor }}>{row.value}</TableCell>
+                    <TableCell sx={{ color: textColor }}>{row.status === 'Healthy' ? '1.3s' : row.status === 'Monitoring' ? '2.1s' : '4.7s'}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -379,20 +304,58 @@ export default function DashboardPage() {
       </Box>
 
       <Grid container spacing={3} sx={{ mt: 0.5 }}>
-        {reportCards.map((card) => (
-          <Grid item xs={12} sm={6} md={3} key={card.title}>
-            <Card sx={{ background: panelBackground, border: `1px solid ${panelBorder}` }}>
-              <CardContent>
-                <Typography variant="body2" color={secondaryText}>{card.title}</Typography>
-                <Typography variant="h5" sx={{ mt: 1, color: textColor }}>{card.value}</Typography>
-                <Typography variant="caption" color="success.main" sx={{ mt: 0.5, display: 'block' }}>
-                  {card.delta}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ background: panelBackground, border: `1px solid ${panelBorder}` }}>
+            <CardContent>
+              <Typography variant="body2" color={secondaryText}>Resolved tickets</Typography>
+              <Typography variant="h5" sx={{ mt: 1, color: textColor }}>2,480</Typography>
+              <Typography variant="caption" color="success.main" sx={{ mt: 0.5, display: 'block' }}>+8.3%</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ background: panelBackground, border: `1px solid ${panelBorder}` }}>
+            <CardContent>
+              <Typography variant="body2" color={secondaryText}>Knowledge coverage</Typography>
+              <Typography variant="h5" sx={{ mt: 1, color: textColor }}>92%</Typography>
+              <Typography variant="caption" color="success.main" sx={{ mt: 0.5, display: 'block' }}>+3.7%</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ background: panelBackground, border: `1px solid ${panelBorder}` }}>
+            <CardContent>
+              <Typography variant="body2" color={secondaryText}>Automation rate</Typography>
+              <Typography variant="h5" sx={{ mt: 1, color: textColor }}>73%</Typography>
+              <Typography variant="caption" color="success.main" sx={{ mt: 0.5, display: 'block' }}>+5.1%</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ background: panelBackground, border: `1px solid ${panelBorder}` }}>
+            <CardContent>
+              <Typography variant="body2" color={secondaryText}>Escalation time</Typography>
+              <Typography variant="h5" sx={{ mt: 1, color: textColor }}>17m</Typography>
+              <Typography variant="caption" color="success.main" sx={{ mt: 0.5, display: 'block' }}>-2.1%</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
+
+      <Box sx={{ mt: 3 }}>
+        <Card sx={{ background: panelBackground, border: `1px solid ${panelBorder}` }}>
+          <CardContent>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+              <Typography variant="h6" sx={{ color: textColor }}>Operations pulse</Typography>
+              <MonitorHeart color="success" />
+            </Stack>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Typography variant="h3" sx={{ fontWeight: 800, lineHeight: 1, color: textColor }}>96.8%</Typography>
+              <Typography variant="body2" color="success.main" fontWeight={700}>service confidence</Typography>
+            </Stack>
+          </CardContent>
+        </Card>
+      </Box>
     </Box>
   );
 }
